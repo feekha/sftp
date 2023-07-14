@@ -1,11 +1,6 @@
+from dash import Dash, dash_table
 import paramiko
 import pandas as pd
-
-#HOST_NAME = "us-securetransfer.dnv.com"
-#USER_NAME = "measurementsne"
-#PASSWORD = "yerD!Hvdt8n5ysh!t"
-#PRIVATE_KEY_FILE = 'measurementsneprivate.pem'
-#PORT = 22
 
 HOST_NAME = "ftp.resourcepanorama.dnvgl.com"
 USER_NAME = "lidardashboard"
@@ -23,24 +18,15 @@ ftp.chdir('HAW')
 ftp.chdir('MAST')
 files = ftp.listdir()
 
-print(files)
-
 with ftp.open('D140245_20230301_0000.csv') as file:
     file.prefetch()
     df = pd.read_csv(file)
 
-print(df)
+df = df.head(10)
 
-'''
-transport = paramiko.Transport(HOST_NAME , PORT)
-print(1, transport)
-transport.start_client()
-print(2 , transport)
-transport.auth_password(USER_NAME, PASSWORD)
-print(3 , transport)
+app = Dash(__name__)
 
-transport
-#pkey = paramiko.RSAKey.from_private_key_file(PRIVATE_KEY_FILE)
-#transport.auth_publickey(USER_NAME, pkey)
+app.layout = dash_table.DataTable(df.to_dict('records'), [{"name": i, "id": i} for i in df.columns])
 
-'''
+if __name__ == '__main__':
+    app.run(debug=True)
